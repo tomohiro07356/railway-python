@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+starlette
+Jinja2
+boto3
+numpy
+datetime
+python-multipart
+aiofiles
+pathlib
+pandas

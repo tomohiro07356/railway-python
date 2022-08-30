@@ -1,0 +1,4 @@
+車両画像を変更する際は
+dateinfo_error.html
+monthly_record.js
+の日付を変更する

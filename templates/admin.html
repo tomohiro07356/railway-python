@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+    <div class="row my-2">
+        <div class="col-4 font-weight-bold">本日の入庫管理車両：{{ ManagedNum }}台</div>
+        <div class="col-4 font-weight-normal">※次回更新時間：{{ message }}</div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="form-group">
+        <form method="POST" action="/dateinfo">
+            <div class="row">
+                <div class="col-2"><input type="date" id="id_date" name="id_date" value={{ dt_now }}
+                    min="2021-02-01" max={{ dt_now }}></div>
+                <div class="col-2"><input type="submit" value="ナンバー認識" formaction="/admin/dateinfo"></div>
+                <div class="col-4"><input type="submit" value="認識不可" formaction="/admin/dateinfo_error"></div>
+                <div class="col-2"><a href={{ log_file }} class="btn btn-primary" download>ログ出力</a></div>
+                <input type="hidden" id="Selected_ID" name="Selected_ID" value="NDB_0001"> 
+                <div class="col-2"><input class="btn btn-outline-primary" type="submit" value="利用履歴" formaction="/admin/monthly_record"></div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<hr>
+
+<!-- 画像表示（カルーセルスライダー） -->
+<div class="img_container">
+    <div id="my-slider" class="crs-wrap">
+      <div class="crs-screen">
+        <div class="crs-screen-roll">
+            {% for id in listDB[0] %}
+            <div class="crs-screen-item" style="background-image: url('{{ listDB[6][loop.index0] }}')">
+                <div class="crs-screen-item-content"><h1>{{ listDB[2][loop.index0] }}  {{ listDB[5][loop.index0] }}</h1></div>
+            </div>
+            {% endfor %}
+        </div>
+      </div>
+      <div class="crs-bar">
+        <div class="crs-bar-roll-current"></div>
+        <div class="crs-bar-roll-wrap">
+          <div class="crs-bar-roll">
+            {% for id in listDB[0] %}
+            <div class="crs-bar-roll-item" style="background-image: url('{{ listDB[6][loop.index0] }}')"></div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+<script>
+    $("#my-slider").camRollSlider();
+</script>
+
+<hr>
+
+<div class="container">
+    <div class="table">
+    <table class="table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">データベースID</th>
+                <th scope="col">日付</th>
+                <th scope="col">時間</th>
+                <th scope="col">ファイル名</th>
+                <th scope="col">利用者</th>
+                <th scope="col">入出庫</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for id in listDB[0] %}
+            <tr>
+                <th scope="row">{{ loop.index }}</th>
+                <td>{{ id }}</td>
+                <td>{{ listDB[1][loop.index0] }}</td>
+                <td>{{ listDB[2][loop.index0] }}</td>
+                <td>{{ listDB[3][loop.index0] }}</td>
+                <td>{{ listDB[5][loop.index0] }}</td>
+                <td>{{ listDB[7][loop.index0] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+
+<br>
+
+{% endblock %}

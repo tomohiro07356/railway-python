@@ -1,0 +1,210 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+    <div class="row my-2">
+        <div class="col-5 font-weight-bold">{{ display_date }} ナンバー認識できなかった車両：{{ ManagedNum }}台</div>
+        <div id="test"></div>
+    </div>
+</div>
+
+<div class="container">
+    <form method="POST">
+        <div class="row">
+            <div class="col-2"><input type="date" id="id_date" name="id_date" value={{ display_date }}
+                min="2020-12-14" max={{ dt_now }}></div>
+            <div class="col-2"><input type="submit" value="ナンバー認識" formaction="/admin/dateinfo"></div>
+            <div class="col-6"><input type="submit" value="認識不可" formaction="/admin/dateinfo_error"></div>
+            <div class="col-2"><a class="btn btn-outline-primary" href="/admin" role="button">本日のデータ</a></div>
+        </div>
+    </form>
+    <div class="row">
+        <div class="col-2">
+        <select id="NDB" onchange="NDBselect()">
+            {% for id in listNDB[0] %} 
+            <option value = "{{ listNDB[0][loop.index0] }},{{ listNDB[1][loop.index0] }},{{listNDB[2][loop.index0]}} {{listNDB[3][loop.index0]}} {{listNDB[4][loop.index0]}} {{listNDB[5][loop.index0]}},{{listNDB[6][loop.index0]}},{{listNDB[7][loop.index0]}},{{listNDB[8][loop.index0]}},{{listNDB[9][loop.index0]}}">
+            {{ listNDB[1][loop.index0] }}</option>
+            {% endfor %}
+        </select>
+        </div>
+        <script>
+            function NDBselect(){
+                var values=document.getElementById('NDB').value.split(',');
+                document.form2.change_id.value = values[0];
+                document.getElementById("ID").innerText = "ID：" + values[0];
+                document.form2.change_person.value = values[1];
+                document.getElementById("Plate").innerText = values[2];
+                document.getElementById("Img").href = values[4] + "?0620a";
+                document.getElementById("Img_tum").src = values[4] + "?0620a";
+                document.getElementById("Maker-Model").innerText = values[5] + " / " + values[6];
+                document.getElementById("Btn_chg").disabled = false;
+            }
+            // 4桁ナンバー検索用
+            var search_flg = 0
+        </script>
+      
+        <div class="col-2">
+            {% for id in listNDB[0] %} 
+            <input type="hidden" class="plateD" id="{{loop.index0}}" value="{{listNDB[5][loop.index0]}}">
+            {% endfor %}
+            <div class="Box">     
+            <input type="number" class="Box-SearchInput" name="FourNum" id="FourNum" min="0" max="9999" placeholder="4桁ナンバー"
+            onkeydown="BtnFourNumClick()">
+            <button type="button" class="Box-Btn" name="BtnFourNum" onclick="BtnFourNumClick()"><i class="fa fa-search Box-Btn-Icon"></i></button>   
+            </div>
+            <script>
+            function BtnFourNumClick(){
+                var num = FourNum.value;
+                var objs = document.getElementsByClassName("plateD");
+                var arr = Array.from(objs);
+                var arr_plateD = []; //358, 1212で同一ナンバー有り
+                var flg_match = false;
+                search_flg += 1
+                arr.forEach(function(obj){
+                    if(num === obj.value){
+                        arr_plateD.push(obj.id);
+                        flg_match = true;
+                    }
+                });
+                if(flg_match === true && arr_plateD.length == 1){
+                    NDB.selectedIndex = arr_plateD[0];
+                }
+                if(flg_match === true && arr_plateD.length > 1 && (search_flg % 2) == 0){
+                    NDB.selectedIndex = arr_plateD[0];
+                }
+                if(flg_match === true && arr_plateD.length > 1 && (search_flg % 2) == 1){
+                    NDB.selectedIndex = arr_plateD[1];
+                }
+                if(flg_match === false){
+                    NDB.selectedIndex = arr.length - 1;
+                }
+                NDBselect();
+            }   
+            </script>
+        </div>
+    </div>
+
+    <div class="row my-2">
+        <div class="col-2">
+            <a href="{{listNDB[7][0]}}?0620a" data-lightbox="CarImg" id="Img" width="185" height="100" class="rounded">
+                <img src="{{listNDB[7][0]}}?0620a"  id="Img_tum" width="200" alt="">
+            </a>
+        </div>
+        <div class="col-2" id="ID">ID：{{listNDB[0][0]}}</div>
+        <div class="col-2" id="Plate">{{listNDB[2][0]}} {{listNDB[3][0]}} {{listNDB[4][0]}} {{listNDB[5][0]}}</div>
+        <div class="col-2" id="Maker-Model">{{listNDB[8][0]}} / {{listNDB[9][0]}}</div>
+
+        <div class="col-2 btn-group-md btn-group-toggle" data-toggle="buttons">
+            <label class="btn btn-outline-warning active">
+            <input type="radio" name="options" id="option_in" autocomplete="off" checked>入庫
+            </label>
+            <label class="btn btn-outline-warning">
+            <input type="radio" name="options" id="option_out" autocomplete="off">出庫
+            </label>
+        </div>
+
+        <form name="form2" method="POST">
+            <input type="hidden" id="id_date" name="id_date" value={{ display_date }}>
+            <input type="hidden" id="change_id" name="change_id" value="nothing">
+            <input type="hidden" id="change_person" name="change_person" value="nothing">
+            <input type="hidden" id="change_img" name="change_img" value="nothing">
+            <input type="hidden" id="change_flg" name="change_flg" value=-1>
+            <input type="hidden" id="in_out" name="in_out" value="nothing">
+            <input type="hidden" id="initial_slide" name="initial_slide" value={{ initial_slide }}>
+            <!-- 編集時にはフラグを1にする -->
+            <script>
+            function BtnChgClick(){
+                var currentSlide = $('.slider-for').slick('slickCurrentSlide');
+                document.form2.change_img.value = currentSlide;
+                document.form2.change_flg.value = 1;
+                document.form2.in_out.value = option_in.checked ? 'in' : 'out'
+            }
+            function BtnDltClick(){
+                var currentSlide = $('.slider-for').slick('slickCurrentSlide');
+                document.form2.change_img.value = currentSlide;
+                document.form2.change_flg.value = 0;
+            }
+            </script>
+
+            <div class="col-1"><input disabled id="Btn_chg"
+                type="submit" value="変更" formaction="/admin/dateinfo_error" class="btn btn-warning" onclick="BtnChgClick()"></div>
+            <div class="col-1 my-2"><input type="submit" value="削除" formaction="/admin/dateinfo_error" class="btn btn-danger" onclick="BtnDltClick()"></div>
+        </form>
+    </div>
+</div>
+
+<hr>
+
+<!-- 画像表示（カルーセルスライダーSlick） -->
+<!-- スライダー本体 -->
+<div class="container">
+    <div class="slider-for" style="margin-bottom: 10px;">
+        {% for id in listDB[2] %}
+        <figure class="car"><img src="{{ listDB[2][loop.index0] }}" width="960" height="540" alt="{{ listDB[1][loop.index0] }}"/></figure>
+        {% endfor %}
+    </div>
+    <div class="slider-text">撮影時刻：{{ listDB[1][0] }}</div>
+    <!-- サムネイル -->
+    <div class="slider-nav">
+        {% for id in listDB[2] %}
+        <figure><img src="{{ listDB[2][loop.index0] }}" ></figure>
+        {% endfor %}
+    </div>
+
+    <!-- 通過時刻用の配列 -->
+    {% for id in listDB[2] %} 
+    <input type="hidden" class="TimeStamp" value="{{listDB[1][loop.index0]}}">
+    {% endfor %}
+
+    <script>
+        $(function() {
+        $('.slider-for').slick({
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        asNavFor: '.slider-nav',
+        centerMode: true,
+        arrows: false,
+        initialSlide: document.form2.initial_slide.value
+        });  
+        $('.slider-nav').slick({
+        slidesToShow: 5,
+        slidesToScroll: 1,
+        asNavFor: '.slider-for',
+        dots: true,
+        centerMode: true,
+        focusOnSelect: true,
+        infinite: false,
+        cssEase: 'linear',
+        initialSlide: document.form2.initial_slide.value
+        });
+
+        //撮影時刻の表示
+        var objs = document.getElementsByClassName("TimeStamp");
+        var arr = Array.from(objs);
+        $('.slider-for').on('afterChange', function(event, slick, currentSlide){
+            $('.slider-text').text("撮影時刻：" + arr[currentSlide].value);
+        });
+    });
+    </script>
+
+   <script>
+    function dispLoading(msg){
+    // 引数なし（メッセージなし）を許容
+    if( msg === undefined ){
+    msg = "";
+    }
+    // 画面表示メッセージ
+    var dispMsg = "<div class='loadingMsg'>" + msg + "</div>";
+    // ローディング画像が表示されていない場合のみ出力
+    if($("#loading").length === 0){
+    $("body").append("<div id='loading'>" + dispMsg + "</div>");
+    }
+    }
+
+    function removeLoading(){
+    $("#loading").remove();
+    }
+    </script>
+</div>
+
+{% endblock %}
