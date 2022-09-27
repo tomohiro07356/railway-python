@@ -127,8 +127,8 @@ function display_car_img_hist(name_num,ym_str){
     //img_listに抽出した画像の表示
     for (let i=0; i<img_list.length; i++){
         let temp_car_img_hist = 
-            '<a href="'+ img_list[i] +'?0620a" data-lightbox="histImg" width="185" height="100" class="rounded" data-title="' + date_list[i] +'">'
-            +'<img src="'+ img_list[i] + '?0620a" width="200" alt="" style="margin:2px;">'
+            '<a href="'+ img_list[i] +'?0927a" data-lightbox="histImg" width="185" height="100" class="rounded" data-title="' + date_list[i] +'">'
+            +'<img src="'+ img_list[i] + '?0927a" width="200" alt="" style="margin:2px;">'
             +'</a>';
         document.getElementById("car_img_hist").insertAdjacentHTML('beforeend',temp_car_img_hist);
     }
@@ -152,8 +152,8 @@ function display_comment(name_num,ym_str){
     document.getElementById("Maker").innerText = "メーカー：" + List_N_Maker[name_num];
     document.getElementById("Model").innerText = "車種：" + List_N_Model[name_num];
     //参考画像の更新
-    document.getElementById("Img_tum").src = List_N_Image[name_num] + "?0620a";
-    document.getElementById("Img").href = List_N_Image[name_num] + "?0620a";
+    document.getElementById("Img_tum").src = List_N_Image[name_num] + "?0927a";
+    document.getElementById("Img").href = List_N_Image[name_num] + "?0927a";
 }
 
 
